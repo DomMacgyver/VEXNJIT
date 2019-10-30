@@ -29,22 +29,22 @@ using namespace vex;
 
 competition Competition;
 
+/**
+  * Moves both roller motors. Speed will depend on the speed
+  * parameter. The range is -100 to 100.
+*/
 void rollers(int speed) {
-    /**
-     * Moves both roller motors. Speed will depend on the speed
-     * parameter. The range is -100 to 100.
-    */
     LeftIntake.spin(directionType::fwd, speed, velocityUnits::pct);
     RightIntake.spin(directionType::rev, speed, velocityUnits::pct);
 }
 
+/** 
+ * Moves the rollers depending on the state of the up and
+ * down buttons. If the up button is pressed, the manipulator
+ * will intake, and if the down button is pressed, the manipulator
+ * will outtake. The up button has priority.
+*/
 void manipulator(controller::button inBtn, controller::button outBtn) {
-    /** 
-     * Moves the rollers depending on the state of the up and
-     * down buttons. If the up button is pressed, the manipulator
-     * will intake, and if the down button is pressed, the manipulator
-     * will outtake. The up button has priority.
-     */
     if (inBtn.pressing()) {
         rollers(100);
     } else if (outBtn.pressing()) {
@@ -54,16 +54,17 @@ void manipulator(controller::button inBtn, controller::button outBtn) {
     }
 }
 
-
-/* ----------------------------------------- */
-/*   DON'T RUN WITHOUT CHECKING DIRECTIONS   */
-/* ----------------------------------------- */
+/** 
+ * Moves the drivetrain based on the "arcade" controls.
+ * There is no priority, the two values are just added
+ * together. For example, if input movements to move mostly
+ * forward and slightly to the right, the left side of the
+ * drive will move slightly faster than the right side.
+ */
 void drive(controller::axis axis3, controller::axis axis1) {
-    /** 
-     * 
-     */
-
-
+    /* ----------------------------------------- */
+    /*   DON'T RUN WITHOUT CHECKING DIRECTIONS   */
+    /* ----------------------------------------- */
     int difference = axis3.value() - axis1.value();
     int addition = axis3.value() - axis3.value();
 
