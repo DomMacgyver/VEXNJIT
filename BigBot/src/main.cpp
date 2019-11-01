@@ -66,7 +66,7 @@ void drive(controller::axis axis3, controller::axis axis1) {
     /*   DON'T RUN WITHOUT CHECKING DIRECTIONS   */
     /* ----------------------------------------- */
     int difference = axis3.value() - axis1.value();
-    int addition = axis3.value() - axis3.value();
+    int addition = axis3.value() + axis1.value();
 
     RightDrive1.spin(directionType::fwd, difference, percentUnits::pct);
     RightDrive2.spin(directionType::fwd, difference, percentUnits::pct);
@@ -76,7 +76,7 @@ void drive(controller::axis axis3, controller::axis axis1) {
     LeftDrive2.spin(directionType::fwd, addition, percentUnits::pct);
     LeftDrive3.spin(directionType::fwd, addition, percentUnits::pct);
     LeftDrive4.spin(directionType::fwd, addition, percentUnits::pct);
-}
+} 
 
 
 
@@ -89,6 +89,8 @@ void usercontrol(void) {
         controller::axis AXIS1 = Controller1.Axis1;
 
         drive(AXIS3, AXIS1);
+
+
 
         manipulator(INTAKE_IN, INTAKE_OUT);
 

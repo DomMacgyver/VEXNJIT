@@ -26,7 +26,7 @@ motor RightDrive4 = motor(PORT2, ratio18_1, false);
 
 /**
  * Used to initialize code/tasks/devices added using tools in VEXcode Text.
- * 
+ *
  * This should be called at the start of your int main function.
  */
 void vexcodeInit( void ) {
