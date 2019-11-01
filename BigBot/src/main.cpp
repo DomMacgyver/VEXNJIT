@@ -68,13 +68,13 @@ void drive(controller::axis axis3, controller::axis axis1) {
     int difference = axis3.value() - axis1.value();
     int addition = axis3.value() + axis1.value();
 
-    RightDrive1.spin(directionType::fwd, difference, percentUnits::pct);
+    RightDrive1.spin(directionType::fwd, addition, percentUnits::pct);
     RightDrive2.spin(directionType::fwd, difference, percentUnits::pct);
     RightDrive3.spin(directionType::fwd, difference, percentUnits::pct);
-    RightDrive4.spin(directionType::fwd, difference, percentUnits::pct);
+    RightDrive4.spin(directionType::fwd, addition, percentUnits::pct);
     LeftDrive1.spin(directionType::fwd, addition, percentUnits::pct);
-    LeftDrive2.spin(directionType::fwd, addition, percentUnits::pct);
-    LeftDrive3.spin(directionType::fwd, addition, percentUnits::pct);
+    LeftDrive2.spin(directionType::fwd, difference, percentUnits::pct);
+    LeftDrive3.spin(directionType::fwd, difference, percentUnits::pct);
     LeftDrive4.spin(directionType::fwd, addition, percentUnits::pct);
 } 
 
