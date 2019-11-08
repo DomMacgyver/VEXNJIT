@@ -14,6 +14,8 @@ extern motor RightDrive1;
 extern motor RightDrive2;
 extern motor RightDrive3;
 extern motor RightDrive4;
+extern motor TrayMotor;
+extern pot trayPot;
 
 /**
  * Used to initialize code/tasks/devices added using tools in VEXcode Text.
