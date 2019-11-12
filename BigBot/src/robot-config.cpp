@@ -16,9 +16,11 @@ motor LeftDrive2 = motor(PORT20, ratio18_1, false);
 motor LeftDrive3 = motor(PORT9, ratio18_1, false);
 motor LeftDrive4 = motor(PORT10, ratio18_1, false);
 motor RightDrive1 = motor(PORT13, ratio18_1, false);
-motor RightDrive2 = motor(PORT12, ratio18_1, false);
-motor RightDrive3 = motor(PORT1, ratio18_1, false);
-motor RightDrive4 = motor(PORT2, ratio18_1, false);
+motor RightDrive2 = motor(PORT14, ratio18_1, false);
+motor RightDrive3 = motor(PORT3, ratio18_1, false);
+motor RightDrive4 = motor(PORT4, ratio18_1, false);
+motor TrayMotor = motor(PORT15, ratio36_1, false);
+pot trayPot = pot(Brain.ThreeWirePort.A);
 
 // VEXcode generated functions
 
@@ -26,7 +28,7 @@ motor RightDrive4 = motor(PORT2, ratio18_1, false);
 
 /**
  * Used to initialize code/tasks/devices added using tools in VEXcode Text.
- *
+ * 
  * This should be called at the start of your int main function.
  */
 void vexcodeInit( void ) {
