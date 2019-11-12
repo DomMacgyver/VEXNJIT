@@ -126,10 +126,10 @@ void usercontrol(void) {
 
         wait(20, msec);
     }
+}
 
-    void autonomous(void) {
+void autonomous(void) {
 
-    }
 }
 
 int main() {
