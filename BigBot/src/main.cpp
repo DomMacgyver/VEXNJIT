@@ -126,12 +126,17 @@ void usercontrol(void) {
 
         wait(20, msec);
     }
+
+    void autonomous(void) {
+
+    }
 }
 
 int main() {
     vexcodeInit();
 
     Competition.drivercontrol(usercontrol);
+    Competition.autonomous(autonomous);
 
     while(1) {
         wait(100, msec);
