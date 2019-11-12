@@ -10,19 +10,19 @@
 // ---- START VEXCODE CONFIGURED DEVICES ----
 // Robot Configuration:
 // [Name]               [Type]        [Port(s)]
-// LeftIntake           motor         19             
-// RightIntake          motor         11              
-// Controller1          controller                    
-// LeftDrive1           motor         18              
-// LeftDrive2           motor         20              
-// LeftDrive3           motor         9               
-// LeftDrive4           motor         10              
-// RightDrive1          motor         13              
-// RightDrive2          motor         14              
-// RightDrive3          motor         3               
-// RightDrive4          motor         4               
-// TrayMotor            motor         15              
-// trayPot              pot           A               
+// LeftIntake           motor         19
+// RightIntake          motor         11
+// Controller1          controller
+// LeftDrive1           motor         18
+// LeftDrive2           motor         20
+// LeftDrive3           motor         9
+// LeftDrive4           motor         10
+// RightDrive1          motor         13
+// RightDrive2          motor         14
+// RightDrive3          motor         3
+// RightDrive4          motor         4
+// TrayMotor            motor         15
+// trayPot              pot           A
 // ---- END VEXCODE CONFIGURED DEVICES ----
 
 #include "vex.h"
@@ -40,7 +40,7 @@ void rollers(int speed) {
     RightIntake.spin(directionType::rev, speed, velocityUnits::pct);
 }
 
-/** 
+/**
  * Moves the rollers to intake and outtake depending on the state of
  * the up and down buttons. If the up button is pressed, the manipulator
  * will intake, and if the down button is pressed, the manipulator will
@@ -59,7 +59,7 @@ void manipulator(controller::button inBtn, controller::button outBtn) {
 /**
   * Moves the tray motor. Speed will depend on the speed parameter.
   * The range is -100 to 100. If speed is 0, the motor will stop with
-  * a brakeType of "hold." 
+  * a brakeType of "hold."
 */
 void tray(int speed) {
     if (speed == 0) {
@@ -69,7 +69,7 @@ void tray(int speed) {
     }
 }
 
-/** 
+/**
  * Move the tray up or down, depending on the state of the up and
  * down buttons. If the up button is pressed, the tray will move upwards.
  * If the down button is pressed, the tray will move downwards. The up
@@ -85,7 +85,7 @@ void trayLift(controller::button inBtn, controller::button outBtn) {
     }
 }
 
-/** 
+/**
  * Moves the drivetrain based on the "arcade" controls.
  * There is no priority, the two values are just added
  * together. For example, if input movements to move mostly
@@ -104,7 +104,7 @@ void drive(controller::axis axis3, controller::axis axis1) {
     LeftDrive2.spin(directionType::fwd, -val1 - val3, percentUnits::pct);
     LeftDrive3.spin(directionType::fwd, -val1 - val3, percentUnits::pct);
     LeftDrive4.spin(directionType::fwd, val3 + val1, percentUnits::pct);
-} 
+}
 
 
 void usercontrol(void) {
@@ -119,7 +119,7 @@ void usercontrol(void) {
         controller::axis AXIS1 = Controller1.Axis1;
 
         drive(AXIS3, AXIS1);
-        
+
         manipulator(INTAKE_IN, INTAKE_OUT);
 
         trayLift(TRAY_UP, TRAY_DOWN);
@@ -129,7 +129,6 @@ void usercontrol(void) {
 }
 
 int main() {
-  // Initializing Robot Configuration. DO NOT REMOVE!
     vexcodeInit();
 
     Competition.drivercontrol(usercontrol);
