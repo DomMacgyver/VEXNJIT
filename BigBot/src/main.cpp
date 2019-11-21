@@ -1,3 +1,22 @@
+// ---- START VEXCODE CONFIGURED DEVICES ----
+// Robot Configuration:
+// [Name]               [Type]        [Port(s)]
+// LeftIntake           motor         19              
+// RightIntake          motor         11              
+// Controller1          controller                    
+// LeftDrive1           motor         18              
+// LeftDrive2           motor         20              
+// LeftDrive3           motor         9               
+// LeftDrive4           motor         10              
+// RightDrive1          motor         13              
+// RightDrive2          motor         14              
+// RightDrive3          motor         3               
+// RightDrive4          motor         4               
+// LeftRollerLift       motor         5               
+// TrayMotor            motor         15              
+// TrayPot              pot           A               
+// RightRollerLift      motor         12              
+// ---- END VEXCODE CONFIGURED DEVICES ----
 /*----------------------------------------------------------------------------*/
 /*                                                                            */
 /*    Module:       main.cpp                                                  */
@@ -93,6 +112,23 @@ void trayLift(controller::button inBtn, controller::button outBtn) {
     }
 }
 
+void tower(int speed) {
+    if (speed == 0) {
+        LeftRollerLift.spin(directionType::fwd, speed, velocityUnits::pct);
+        RightRollerLift.spin(directionType::rev, speed, velocityUnits::pct);
+    }
+}
+
+void rollerLift(controller::button upBtn, controller::button downBtn) {
+    if (upBtn.pressing()) {
+        tower(100);
+    } else if (downBtn.pressing()) {
+        tower(-100);
+    } else {
+        tower(0);
+    }
+}
+
 /**
  * Moves the drivetrain based on the "arcade" controls.
  * There is no priority, the two values are just added
@@ -117,11 +153,11 @@ void drive(controller::axis axis3, controller::axis axis1) {
 
 void usercontrol(void) {
     while(1) {
-        controller::button INTAKE_IN = Controller1.ButtonR1;
-        controller::button INTAKE_OUT = Controller1.ButtonR2;
+        controller::button INTAKE_IN = Controller1.ButtonL1;
+        controller::button INTAKE_OUT = Controller1.ButtonL2;
 
-        controller::button TRAY_UP = Controller1.ButtonL1;
-        controller::button TRAY_DOWN = Controller1.ButtonL2;
+        controller::button TRAY_UP = Controller1.ButtonR1;
+        controller::button TRAY_DOWN = Controller1.ButtonR2;
 
         controller::axis AXIS3 = Controller1.Axis3;
         controller::axis AXIS1 = Controller1.Axis1;
@@ -129,11 +165,16 @@ void usercontrol(void) {
         controller::button ROLLER_UP = Controller1.ButtonUp;
         controller::button ROLLER_DOWN = Controller1.ButtonDown;
 
+        controller::button RLIFT_UP = Controller1.ButtonUp;
+        controller::button RLIFT_DOWN = Controller1.ButtonDown;
+
         drive(AXIS3, AXIS1);
 
         manipulator(INTAKE_IN, INTAKE_OUT);
 
         trayLift(TRAY_UP, TRAY_DOWN);
+
+        rollerLift(RLIFT_UP, RLIFT_DOWN);
 
         wait(20, msec);
     }
