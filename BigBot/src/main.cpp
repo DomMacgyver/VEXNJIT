@@ -112,7 +112,7 @@ void trayTilt(controller::button inBtn, controller::button outBtn) {
     }
 }
 
-void tower(int speed) {
+void lift(int speed) {
     if (speed == 0) {
         LeftRollerLift.spin(directionType::fwd, speed, velocityUnits::pct);
         RightRollerLift.spin(directionType::rev, speed, velocityUnits::pct);
@@ -121,11 +121,11 @@ void tower(int speed) {
 
 void rollerLift(controller::button upBtn, controller::button downBtn) {
     if (upBtn.pressing()) {
-        tower(100);
+        lift(100);
     } else if (downBtn.pressing()) {
-        tower(-100);
+        lift(-100);
     } else {
-        tower(0);
+        lift(0);
     }
 }
 
