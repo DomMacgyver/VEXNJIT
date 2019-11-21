@@ -6,7 +6,6 @@
 /*    Description:  V5 project                                                */
 /*                                                                            */
 /*----------------------------------------------------------------------------*/
-
 // ---- START VEXCODE CONFIGURED DEVICES ----
 // Robot Configuration:
 // [Name]               [Type]        [Port(s)]
@@ -38,6 +37,15 @@ competition Competition;
 void rollers(int speed) {
     LeftIntake.spin(directionType::fwd, speed, velocityUnits::pct);
     RightIntake.spin(directionType::rev, speed, velocityUnits::pct);
+}
+
+/**
+  * Moves the arm of the roller motors. Speed will depend on the speed
+  * parameter. The range is -100 to 100.  
+*/
+void rollerLifts(int speed) {
+    LeftRollerLift.spin(directionType::fwd, speed, velocityUnits::pct);
+    RightRollerLift.spin(directionType::rev, speed, velocityUnits::pct);
 }
 
 /**
@@ -117,6 +125,9 @@ void usercontrol(void) {
 
         controller::axis AXIS3 = Controller1.Axis3;
         controller::axis AXIS1 = Controller1.Axis1;
+
+        controller::button ROLLER_UP = Controller1.ButtonUp;
+        controller::button ROLLER_DOWN = Controller1.ButtonDown;
 
         drive(AXIS3, AXIS1);
 
