@@ -79,7 +79,7 @@ void manipulator(controller::button inBtn, controller::button outBtn) {
   * The range is -100 to 100. If speed is 0, the motor will stop with
   * a brakeType of "hold."
 */
-void tray(int speed) {
+void tilter(int speed) {
     if (speed == 0) {
         TrayMotor.stop(brakeType::hold);
     } else {
@@ -95,11 +95,11 @@ void tray(int speed) {
 */
 void trayTilt(controller::button inBtn, controller::button outBtn) {
     if (inBtn.pressing()) {
-        tray(100);
+        tilter(100);
     } else if (outBtn.pressing()) {
-        tray(-100);
+        tilter(-100);
     } else {
-        tray(0);
+        tilter(0);
     }
 }
 
