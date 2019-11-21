@@ -59,15 +59,6 @@ void rollers(int speed) {
 }
 
 /**
-  * Moves the arm of the roller motors. Speed will depend on the speed
-  * parameter. The range is -100 to 100.
-*/
-void rollerLifts(int speed) {
-    LeftRollerLift.spin(directionType::fwd, speed, velocityUnits::pct);
-    RightRollerLift.spin(directionType::rev, speed, velocityUnits::pct);
-}
-
-/**
  * Moves the rollers to intake and outtake depending on the state of
  * the up and down buttons. If the up button is pressed, the manipulator
  * will intake, and if the down button is pressed, the manipulator will
