@@ -162,9 +162,6 @@ void usercontrol(void) {
         controller::axis AXIS3 = Controller1.Axis3;
         controller::axis AXIS1 = Controller1.Axis1;
 
-        controller::button ROLLER_UP = Controller1.ButtonUp;
-        controller::button ROLLER_DOWN = Controller1.ButtonDown;
-
         controller::button RLIFT_UP = Controller1.ButtonUp;
         controller::button RLIFT_DOWN = Controller1.ButtonDown;
 
