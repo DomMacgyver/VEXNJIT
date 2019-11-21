@@ -50,8 +50,8 @@ using namespace vex;
 competition Competition;
 
 /**
-  * Moves both roller motors. Speed will depend on the speed
-  * parameter. The range is -100 to 100.
+  * Moves both roller motors. Speed will depend on the speed parameter.
+  * The range is -100 to 100.
 */
 void rollers(int speed) {
     LeftIntake.spin(directionType::fwd, speed, velocityUnits::pct);
@@ -60,9 +60,9 @@ void rollers(int speed) {
 
 /**
  * Moves the rollers to intake and outtake depending on the state of
- * the up and down buttons. If the up button is pressed, the manipulator
- * will intake, and if the down button is pressed, the manipulator will
- * outtake. The up button has priority.
+ * the up and down buttons. If the up button is pressed, the
+ * manipulator will intake, and if the down button is pressed, the
+ * manipulator will outtake. The up button has priority.
 */
 void manipulator(controller::button inBtn, controller::button outBtn) {
     if (inBtn.pressing()) {
@@ -75,9 +75,9 @@ void manipulator(controller::button inBtn, controller::button outBtn) {
 }
 
 /**
-  * Moves the tray motor. Speed will depend on the speed parameter.
-  * The range is -100 to 100. If speed is 0, the motor will stop with
-  * a brakeType of "hold."
+  * Moves the tray motor. Speed will depend on the speed parameter. The
+  * range is -100 to 100. If speed is 0, the motor will stop with a
+  * brakeType of "hold."
 */
 void tilter(int speed) {
     if (speed == 0) {
@@ -88,9 +88,9 @@ void tilter(int speed) {
 }
 
 /**
- * Move the tray up or down, depending on the state of the up and
- * down buttons. If the up button is pressed, the tray will move upwards.
- * If the down button is pressed, the tray will move downwards. The up
+ * Move the tray up or down, depending on the state of the up and down
+ * buttons. If the up button is pressed, the tray will move upwards. If
+ * the down button is pressed, the tray will move downwards. The up
  * button has priority.
 */
 void trayTilt(controller::button inBtn, controller::button outBtn) {
@@ -102,6 +102,7 @@ void trayTilt(controller::button inBtn, controller::button outBtn) {
         tilter(0);
     }
 }
+
 
 void lift(int speed) {
     if (speed == 0) {
@@ -121,11 +122,11 @@ void rollerLift(controller::button upBtn, controller::button downBtn) {
 }
 
 /**
- * Moves the drivetrain based on the "arcade" controls.
- * There is no priority, the two values are just added
- * together. For example, if input movements to move mostly
- * forward and slightly to the right, the left side of the
- * drive will move slightly faster than the right side.
+ * Moves the drivetrain based on the "arcade" controls. There is no
+ * priority, the two values are just added together. For example, if
+ * input movements to move mostly forward and slightly to the right,
+ * the left side of the drive will move slightly faster than the right
+ * side.
  */
 void drive(controller::axis axis3, controller::axis axis1) {
     int val1 = axis1.value();
