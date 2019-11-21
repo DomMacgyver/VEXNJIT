@@ -1,21 +1,21 @@
 // ---- START VEXCODE CONFIGURED DEVICES ----
 // Robot Configuration:
 // [Name]               [Type]        [Port(s)]
-// LeftIntake           motor         19              
-// RightIntake          motor         11              
-// Controller1          controller                    
-// LeftDrive1           motor         18              
-// LeftDrive2           motor         20              
-// LeftDrive3           motor         9               
-// LeftDrive4           motor         10              
-// RightDrive1          motor         13              
-// RightDrive2          motor         14              
-// RightDrive3          motor         3               
-// RightDrive4          motor         4               
-// LeftRollerLift       motor         5               
-// TrayMotor            motor         15              
-// TrayPot              pot           A               
-// RightRollerLift      motor         12              
+// LeftIntake           motor         19
+// RightIntake          motor         11
+// Controller1          controller
+// LeftDrive1           motor         18
+// LeftDrive2           motor         20
+// LeftDrive3           motor         9
+// LeftDrive4           motor         10
+// RightDrive1          motor         13
+// RightDrive2          motor         14
+// RightDrive3          motor         3
+// RightDrive4          motor         4
+// LeftRollerLift       motor         5
+// TrayMotor            motor         15
+// TrayPot              pot           A
+// RightRollerLift      motor         12
 // ---- END VEXCODE CONFIGURED DEVICES ----
 /*----------------------------------------------------------------------------*/
 /*                                                                            */
@@ -60,7 +60,7 @@ void rollers(int speed) {
 
 /**
   * Moves the arm of the roller motors. Speed will depend on the speed
-  * parameter. The range is -100 to 100.  
+  * parameter. The range is -100 to 100.
 */
 void rollerLifts(int speed) {
     LeftRollerLift.spin(directionType::fwd, speed, velocityUnits::pct);
@@ -102,7 +102,7 @@ void tray(int speed) {
  * If the down button is pressed, the tray will move downwards. The up
  * button has priority.
 */
-void trayLift(controller::button inBtn, controller::button outBtn) {
+void trayTilt(controller::button inBtn, controller::button outBtn) {
     if (inBtn.pressing()) {
         tray(100);
     } else if (outBtn.pressing()) {
@@ -172,7 +172,7 @@ void usercontrol(void) {
 
         manipulator(INTAKE_IN, INTAKE_OUT);
 
-        trayLift(TRAY_UP, TRAY_DOWN);
+        trayTilt(TRAY_UP, TRAY_DOWN);
 
         rollerLift(RLIFT_UP, RLIFT_DOWN);
 
