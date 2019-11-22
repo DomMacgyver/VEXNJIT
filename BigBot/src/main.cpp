@@ -103,7 +103,10 @@ void trayTilt(controller::button inBtn, controller::button outBtn) {
     }
 }
 
-
+/**
+ * Moves the roller lift. Speed will depend on the speed parameter. The
+ * range is -100 to 100.
+*/
 void lift(int speed) {
     if (speed == 0) {
         LeftRollerLift.spin(directionType::fwd, speed, velocityUnits::pct);
@@ -111,6 +114,12 @@ void lift(int speed) {
     }
 }
 
+/**
+ * Move the lift up or down, depending on the state of the up and down
+ * buttons. If the up button is pressed, the tray will move upwards. if
+ * the down button is pressed, the tray will move downwards. Theup
+ * button has priority.
+*/
 void rollerLift(controller::button upBtn, controller::button downBtn) {
     if (upBtn.pressing()) {
         lift(100);
