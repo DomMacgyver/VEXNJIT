@@ -1,6 +1,82 @@
 // ---- START VEXCODE CONFIGURED DEVICES ----
 // Robot Configuration:
 // [Name]               [Type]        [Port(s)]
+// LeftIntake           motor         19              
+// RightIntake          motor         11              
+// Controller1          controller                    
+// LeftDrive1           motor         18              
+// LeftDrive2           motor         20              
+// LeftDrive3           motor         9               
+// LeftDrive4           motor         10              
+// RightDrive1          motor         13              
+// RightDrive2          motor         14              
+// RightDrive3          motor         3               
+// RightDrive4          motor         4               
+// LeftRollerLift       motor         16              
+// TrayMotor            motor         15              
+// TrayPot              pot           A               
+// RightRollerLift      motor         5               
+// ---- END VEXCODE CONFIGURED DEVICES ----
+// ---- START VEXCODE CONFIGURED DEVICES ----
+// Robot Configuration:
+// [Name]               [Type]        [Port(s)]
+// LeftIntake           motor         19              
+// RightIntake          motor         11              
+// Controller1          controller                    
+// LeftDrive1           motor         18              
+// LeftDrive2           motor         20              
+// LeftDrive3           motor         9               
+// LeftDrive4           motor         10              
+// RightDrive1          motor         13              
+// RightDrive2          motor         14              
+// RightDrive3          motor         3               
+// RightDrive4          motor         4               
+// LeftRollerLift       motor         12              
+// TrayMotor            motor         15              
+// TrayPot              pot           A               
+// RightRollerLift      motor         5               
+// ---- END VEXCODE CONFIGURED DEVICES ----
+// ---- START VEXCODE CONFIGURED DEVICES ----
+// Robot Configuration:
+// [Name]               [Type]        [Port(s)]
+// LeftIntake           motor         19              
+// RightIntake          motor         11              
+// Controller1          controller                    
+// LeftDrive1           motor         18              
+// LeftDrive2           motor         20              
+// LeftDrive3           motor         9               
+// LeftDrive4           motor         10              
+// RightDrive1          motor         13              
+// RightDrive2          motor         14              
+// RightDrive3          motor         3               
+// RightDrive4          motor         4               
+// LeftRollerLift       motor         12              
+// TrayMotor            motor         15              
+// TrayPot              pot           A               
+// RightRollerLift      motor         6               
+// ---- END VEXCODE CONFIGURED DEVICES ----
+// ---- START VEXCODE CONFIGURED DEVICES ----
+// Robot Configuration:
+// [Name]               [Type]        [Port(s)]
+// LeftIntake           motor         19              
+// RightIntake          motor         11              
+// Controller1          controller                    
+// LeftDrive1           motor         18              
+// LeftDrive2           motor         20              
+// LeftDrive3           motor         9               
+// LeftDrive4           motor         10              
+// RightDrive1          motor         13              
+// RightDrive2          motor         14              
+// RightDrive3          motor         3               
+// RightDrive4          motor         4               
+// LeftRollerLift       motor         5               
+// TrayMotor            motor         15              
+// TrayPot              pot           A               
+// RightRollerLift      motor         6               
+// ---- END VEXCODE CONFIGURED DEVICES ----
+// ---- START VEXCODE CONFIGURED DEVICES ----
+// Robot Configuration:
+// [Name]               [Type]        [Port(s)]
 // LeftIntake           motor         19
 // RightIntake          motor         11
 // Controller1          controller
@@ -97,7 +173,7 @@ void trayTilt(controller::button inBtn, controller::button outBtn) {
     if (inBtn.pressing()) {
         tilter(100);
     } else if (outBtn.pressing()) {
-        tilter(-100);
+        tilter(-50);
     } else {
         tilter(0);
     }
@@ -108,9 +184,12 @@ void trayTilt(controller::button inBtn, controller::button outBtn) {
  * range is -100 to 100.
 */
 void lift(int speed) {
-    if (speed == 0) {
+    if (speed != 0) {
         LeftRollerLift.spin(directionType::fwd, speed, velocityUnits::pct);
         RightRollerLift.spin(directionType::rev, speed, velocityUnits::pct);
+    } else {
+        LeftRollerLift.stop(brakeType::hold);
+        RightRollerLift.stop(brakeType::hold);
     }
 }
 
