@@ -15,13 +15,18 @@
 #define LEFT_LIFT_PORT = 16
 #define RIGHT_LIFT_PORT = 5
 
+#define TILTER_PORT = 15
+
 Controller masterController;
 
 ControllerButton intakeIn(ControllerDigital::L1);
 ControllerButton intakeOut(ControllerDigital::L2);
+ControllerButton trayDown(ControllerDigital::R1);
+ControllerButton trayUp(ControllerDigital::R2);
 
 Motor leftRoller(LEFT_ROLLER_PORT);
 Motor rightRoller(RIGHT_ROLLER_PORT);
+Motor trayMotor(TILTER_PORT);
 
 
 void on_center_button() {}
@@ -35,6 +40,9 @@ void initialize() {
 	rightRoller.setBrakeMode(AbstractMotor::brakeMode::hold);
 	leftRoller.setGearing(AbstractMotor::gearset::green);
 	rightRoller.setGearing(AbstractMotor::gearset::green);
+
+	trayMotor.setBrakeMode(AbstractMotor::brakeMode::hold);
+	trayMotor.setGearing(AbstractMotor::gearset::red);
 }
 
 
@@ -46,6 +54,16 @@ void rollers(int speed) {
 	leftRoller.move_velocity(speed * 2);
 	rightRoller.move_velocity(speed * 2);
 }
+
+/**
+  * Moves the tray motor. Speed will depend on the speed parameter. The
+  * range is -100 to 100. If speed is 0, the motor will stop with a
+  * brakeType of "hold."
+*/
+void tilter(int speed) {
+	trayMotor.move_velocity(speed);
+}
+
 
 /**
  * Moves the rollers to intake and outtake depending on the state of
@@ -63,24 +81,28 @@ void rollerControl(ControllerButton inBtn, ControllerButton outBtn) {
 	}
 }
 
-
-auto tankChassis = ChassisControllerFactory::create(
-	{LEFT_DRIVE_1_PORT, -LEFT_DRIVE_2_PORT, -LEFT_DRIVE_3_PORT, LEFT_DRIVE_4_PORT},
-	{-RIGHT_DRIVE_1_PORT, RIGHT_DRIVE_2_PORT, RIGHT_DRIVE_3_PORT, -RIGHT_DRIVE_4_PORT},
-	Abstract::gearset::green,
-	{4.00_in, 16.00_in}
-);
+/**
+ * Move the tray up or down, depending on the state of the up and down
+ * buttons. If the up button is pressed, the tray will move upwards. If
+ * the down button is pressed, the tray will move downwards. The up
+ * button has priority.
+*/
+void tilterControl(ControllerButton upBtn, ControllerButton downBtn) {
+	if (downBtn.isPressed()) {
+		tilter(100);
+	} else if (upBtn.isPressed()) {
+		tilter(-50);
+	} else {
+		tilter(0);
+	}
+}
 
 
 void opcontrol() {
 
 	while (true) {
-		tankChassis.arcade(
-			masterController.getAnalog(ControllerAnalog::leftY),
-			masterController.getAnalog(ControllerAnalog::rightX)
-		);
-
 		rollerControl(intakeIn, intakeOut);
+		tilterControl(trayUp, trayDown);
 
 		pros::delay(20);
 	}
