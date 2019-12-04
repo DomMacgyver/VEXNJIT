@@ -161,8 +161,12 @@ void liftControl(ControllerButton upBtn, ControllerButton downBtn) {
 void driveControl() {
 	double leftY = masterController.getAnalog(ControllerAnalog::leftY);
 	double rightX = masterContrlller.getAnalog(ControllerAnalog::rightX);
-	double val1 = pow((leftY * 10), 2) * 2;
-	double val2 = pow((rightX * 10), 2) * 2;
+
+	double signMultiplier_LeftY = leftY / abs(leftY);
+	double signMultiplier_RightX = rightX / abs(rightX);
+
+	double val1 = pow((leftY * 10), 2) * 2 * signMultiplier_LeftY;
+	double val2 = pow((rightX * 10), 2) * 2 * signMultiplier_RightX;
 
 	rightDrive1.move_velocity(val1 - val2);
 	rightDrive2.move_velocity(val2 - val1);
