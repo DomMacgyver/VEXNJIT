@@ -71,7 +71,9 @@ void initialize() {
 	leftDrive3.setGearing(AbstractMotor::gearset::green);
 	leftDrive4.setGearing(AbstractMotor::gearset::green);
 
-
+	// Set lifts' current position to 0
+	leftLift.tarePosition();
+	rightLift.tarePosition();
 }
 
 
@@ -165,8 +167,8 @@ void driveControl() {
 	double signMultiplier_LeftY = leftY / abs(leftY);
 	double signMultiplier_RightX = rightX / abs(rightX);
 
-	double val1 = pow((leftY * 10), 2) * 2 * signMultiplier_LeftY;
-	double val2 = pow((rightX * 10), 2) * 2 * signMultiplier_RightX;
+	double val1 = pow(leftY / sqrt(127), 2) * (200 / 127) * signMultiplier_LeftY;
+	double val2 = pow(rightX / sqrt(127), 2) * (200 / 127) * signMultiplier_RightX;
 
 	rightDrive1.move_velocity(val1 - val2);
 	rightDrive2.move_velocity(val2 - val1);
