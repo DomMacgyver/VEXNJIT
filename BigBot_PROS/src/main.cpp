@@ -1,5 +1,6 @@
 #include "main.h"
 
+using namespace std;
 
 int LEFT_ROLLER_PORT = 19;
 int RIGHT_ROLLER_PORT = 11;
@@ -35,6 +36,11 @@ ControllerButton liftDown(ControllerDigital::down);
 ControllerButton trayDown(ControllerDigital::R1);
 ControllerButton trayUp(ControllerDigital::R2);
 
+ControllerButton presetX(ControllerDigital::X);
+ControllerButton presetB(ControllerDigital::B);
+
+ControllerButton slowBackBtn(ControllerDigital::left);
+
 
 auto chassis = ChassisControllerFactory::create(
 	{-LEFT_DRIVE_1_PORT, LEFT_DRIVE_2_PORT, LEFT_DRIVE_3_PORT, -LEFT_DRIVE_4_PORT},
@@ -43,10 +49,15 @@ auto chassis = ChassisControllerFactory::create(
 	{4_in, 16_in}
 );
 auto motion = AsyncControllerFactory::motionProfile(
+	0.10,
 	0.3,
-	0.8,
-	5.0,
+	1.0,
 	chassis
+);
+auto drive = ChassisModelFactory::create(
+	{LEFT_DRIVE_1_PORT, -LEFT_DRIVE_2_PORT, -LEFT_DRIVE_3_PORT, LEFT_DRIVE_4_PORT},
+	{-RIGHT_DRIVE_1_PORT, RIGHT_DRIVE_2_PORT, RIGHT_DRIVE_3_PORT, -RIGHT_DRIVE_4_PORT},
+	200.0
 );
 
 
@@ -58,14 +69,18 @@ void initialize() {
 	rightLift.setBrakeMode(AbstractMotor::brakeMode::hold);
 	trayMotor.setBrakeMode(AbstractMotor::brakeMode::hold);
 
-	motion.generatePath(
-		{
-			Point{0_ft, 0_ft, 0_deg},
-			Point{2_ft, 1_ft, 0_deg}
-		},
-		"A"
-	);
+	leftLift.tarePosition();
+	rightLift.tarePosition();
 
+	// motion.generatePath(
+	// 	{
+	// 		Point{0_ft, 0_ft, 0_deg},
+	// 		Point{2_ft, 2_ft, 45_deg}
+	// 	},
+	// 	"A"
+	// );
+
+	pros::lcd::initialize();
 }
 
 
@@ -74,8 +89,8 @@ void competition_initialize() {}
 
 
 void autonomous() {
-	motion.setTarget("A");
-	motion.waitUntilSettled();
+	// motion.setTarget("A", false);
+	// motion.waitUntilSettled();
 }
 
 
@@ -96,6 +111,17 @@ void rollers(int speed) {
 void lift(int speed) {
 	leftLift.move_velocity(speed * 2);
 	rightLift.move_velocity(-speed * 2);
+}
+
+
+/**
+ * Moves the roller lift to a specific absolute position. Position will
+ * depend on the pos parameter. Speed will depend on the speed
+ * parameter.
+*/
+void liftPosition(int pos, int speed) {
+	leftLift.move_absolute(pos, speed);
+	rightLift.move_absolute(-pos, speed);
 }
 
 
@@ -134,11 +160,53 @@ void rollersControl() {
 */
 void liftControl() {
 	if (liftUp.isPressed()) {
-		lift(100);
+		lift(90);
 	} else if (liftDown.isPressed()) {
-		lift(-100);
-	} else {
+		lift(-90);
+	}
+
+	if (liftUp.changedToReleased() || liftDown.changedToReleased()) {
 		lift(0);
+	}
+}
+
+
+/**
+ * Moves the lift to a specific height, depending on the button pressed
+ * in the XYAB button mapping. If there is a significant difference
+ * between the two arms, they will stop and automatically re-align.
+*/
+void liftPresets() {
+	if (presetX.isPressed()) {
+		liftPosition(1100, 110);
+	}
+	if (presetB.isPressed()) {
+		liftPosition(0, 110);
+	}
+
+	int diff = abs(leftLift.get_position()) - abs(rightLift.get_position());
+
+	if (abs(diff) > 90) {
+		int direction = leftLift.get_direction();
+
+		int reset_speed = 80;
+		if (direction == 1) {
+			if (diff > 0) {
+				rightLift.move_velocity(0);
+				leftLift.move_absolute(-rightLift.get_position(), reset_speed);
+			} else {
+				leftLift.move_velocity(0);
+				rightLift.move_absolute(-leftLift.get_position(), reset_speed);
+			}
+		} else {
+			if (diff > 0) {
+				rightLift.move_velocity(0);
+				leftLift.move_absolute(-rightLift.get_position(), reset_speed);
+			} else {
+				leftLift.move_velocity(0);
+				rightLift.move_absolute(-leftLift.get_position(), reset_speed);
+			}
+		}
 	}
 }
 
@@ -159,11 +227,14 @@ void tilterControl() {
 	}
 }
 
-auto drive = ChassisModelFactory::create(
-	{LEFT_DRIVE_1_PORT, -LEFT_DRIVE_2_PORT, -LEFT_DRIVE_3_PORT, LEFT_DRIVE_4_PORT},
-	{-RIGHT_DRIVE_1_PORT, RIGHT_DRIVE_2_PORT, RIGHT_DRIVE_3_PORT, -RIGHT_DRIVE_4_PORT},
-	200.0
-);
+
+void slowBack() {
+	if (slowBackBtn.isPressed()) {
+		drive.forward(-.07);
+		rollers(25);
+	}
+}
+
 
 void opcontrol() {
 	while(true) {
@@ -175,6 +246,8 @@ void opcontrol() {
 		rollersControl();
 		liftControl();
 		tilterControl();
+		liftPresets();
+		slowBack();
 
 		pros::delay(20);
 	}
