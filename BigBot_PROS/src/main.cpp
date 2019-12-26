@@ -228,6 +228,10 @@ void tilterControl() {
 }
 
 
+/**
+ * Slowly moves the drive backwards while moving the rollers forward.
+ * Use this to safely back out after scoring.
+*/
 void slowBack() {
 	if (slowBackBtn.isPressed()) {
 		drive.forward(-.07);
