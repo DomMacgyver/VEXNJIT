@@ -49,9 +49,9 @@ auto chassis = ChassisControllerFactory::create(
 	{4_in, 16_in}
 );
 auto motion = AsyncControllerFactory::motionProfile(
-	0.10,
+	0.25,
 	0.3,
-	1.0,
+	1.6,
 	chassis
 );
 auto drive = ChassisModelFactory::create(
@@ -72,13 +72,13 @@ void initialize() {
 	leftLift.tarePosition();
 	rightLift.tarePosition();
 
-	// motion.generatePath(
-	// 	{
-	// 		Point{0_ft, 0_ft, 0_deg},
-	// 		Point{2_ft, 2_ft, 45_deg}
-	// 	},
-	// 	"A"
-	// );
+	motion.generatePath(
+		{
+			Point{0_ft, 0_ft, 0_deg},
+			Point{2_ft, 2_ft, 45_deg}
+		},
+		"A"
+	);
 
 	pros::lcd::initialize();
 }
@@ -89,8 +89,8 @@ void competition_initialize() {}
 
 
 void autonomous() {
-	// motion.setTarget("A", false);
-	// motion.waitUntilSettled();
+	motion.setTarget("A", true);
+	motion.waitUntilSettled();
 }
 
 
