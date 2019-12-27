@@ -72,6 +72,8 @@ void initialize() {
 	leftLift.tarePosition();
 	rightLift.tarePosition();
 
+	pros::lcd::initialize();
+
 	motion.generatePath(
 		{
 			Point{0_ft, 0_ft, 0_deg},
@@ -79,8 +81,6 @@ void initialize() {
 		},
 		"A"
 	);
-
-	pros::lcd::initialize();
 }
 
 

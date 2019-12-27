@@ -8,11 +8,19 @@ int RIGHT_FRONT_DRIVE_PORT = 11;
 int RIGHT_BACK_DRIVE_PORT = 1;
 int LEFT_CLAMP_PORT = 19;
 int RIGHT_CLAMP_PORT = 12;
+int TOP_LEFT_LIFT_PORT = 2;
+int BOTTOM_LEFT_LIFT_PORT = 3;
+int TOP_RIGHT_LIFT_PORT = 9;
+int BOTTOM_RIGHT_LIFT_PORT = 8;
 
 Controller joystick;
 
 Motor leftClampMotor(LEFT_CLAMP_PORT, false, AbstractMotor::gearset::red);
 Motor rightClampMotor(RIGHT_CLAMP_PORT, false, AbstractMotor::gearset::red);
+Motor topLeftLiftMotor(TOP_LEFT_LIFT_PORT, false, AbstractMotor::gearset::red);
+Motor bottomLeftLiftMotor(BOTTOM_LEFT_LIFT_PORT, false, AbstractMotor::gearset::red);
+Motor topRightLiftMotor(TOP_RIGHT_LIFT_PORT, false, AbstractMotor::gearset::red);
+Motor bottomRightLiftMotor(BOTTOM_RIGHT_LIFT_PORT, false, AbstractMotor::gearset::red);
 
 ControllerButton clampBtn(ControllerDigital::L1);
 
