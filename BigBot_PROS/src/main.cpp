@@ -77,10 +77,31 @@ void initialize() {
 	motion.generatePath(
 		{
 			Point{0_ft, 0_ft, 0_deg},
-			Point{2_ft, 2_ft, 45_deg}
+			Point{3.5_ft, 0_ft, 0_deg}
 		},
 		"A"
 	);
+	motion.generatePath(
+		{
+			Point{0_ft, 0_ft, 0_deg},
+			Point{-3.0_ft, 2.0_ft, 0_deg}
+		},
+		"B"
+	);
+	motion.generatePath(
+		{
+			Point{0_ft, 0_ft, 0_deg},
+			Point{2.7_ft, 0_ft, 0_deg}
+		},
+		"C"
+	);
+	motion.generatePath(
+		{
+			Point{0_ft, 0_ft, 0_deg},
+			Point{-2.4_ft, 1.0_ft, 67_deg}
+		},
+		"D"
+	)
 }
 
 
@@ -89,8 +110,14 @@ void competition_initialize() {}
 
 
 void autonomous() {
-	motion.setTarget("A", true);
+	rollers(100);
+	motion.setTarget("A", false);
 	motion.waitUntilSettled();
+	motion.setTarget("B", true);
+	motion.waitUntilSettled();
+	motion.setTarget("C", false);
+	motion.waitUntilSettled();
+	motion.setTarget("D", true);
 }
 
 
