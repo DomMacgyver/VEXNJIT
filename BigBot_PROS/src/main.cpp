@@ -39,7 +39,7 @@ ControllerButton trayUp(ControllerDigital::R2);
 ControllerButton presetX(ControllerDigital::X);
 ControllerButton presetB(ControllerDigital::B);
 
-ControllerButton slowBackBtn(ControllerDigital::left);
+ControllerButton slowRollBtn(ControllerDigital::Y);
 
 
 auto chassis = ChassisControllerFactory::create(
@@ -74,13 +74,27 @@ void initialize() {
 
 	pros::lcd::initialize();
 
-	motion.generatePath(
-		{
-			Point{0_ft, 0_ft, 0_deg},
-			Point{2_ft, 2_ft, 45_deg}
-		},
-		"A"
-	);
+	// motion.generatePath(
+	// 	{
+	// 		Point{0_ft, 0_ft, 0_deg},
+	// 		Point{3_ft, 0_ft, 0_deg}
+	// 	},
+	// 	"A"
+	// );
+	// motion.generatePath(
+	// 	{
+	// 		Point{0_ft, 0_ft, 0_deg},
+	// 		Point{-2_ft, 0_ft, 0_deg}
+	// 	},
+	// 	"B"
+	// );
+	// motion.generatePath(
+	// 	{
+	// 		Point{1_ft, 0_ft, 0_deg},
+	// 		Point{0_ft, 0_ft, 0_deg}
+	// 	},
+	// 	"C"
+	// );
 }
 
 
@@ -89,8 +103,18 @@ void competition_initialize() {}
 
 
 void autonomous() {
-	motion.setTarget("A", true);
-	motion.waitUntilSettled();
+	// motion.setTarget("A", false);
+	// motion.waitUntilSettled();
+	//
+	// motion.setTarget("B", true);
+	// motion.waitUntilSettled();
+	//
+	// chassis.turnAngle(135_deg);
+	//
+	// motion.setTarget("C", false);
+	// motion.waitUntilSettled();
+
+	chassis.rotate(20);
 }
 
 
@@ -146,6 +170,8 @@ void rollersControl() {
 		rollers(100);
 	} else if (intakeOut.isPressed()) {
 		rollers(-100);
+	} else if (slowRollBtn.isPressed()) {
+		rollers(25);
 	} else {
 		rollers(0);
 	}
@@ -228,18 +254,6 @@ void tilterControl() {
 }
 
 
-/**
- * Slowly moves the drive backwards while moving the rollers forward.
- * Use this to safely back out after scoring.
-*/
-void slowBack() {
-	if (slowBackBtn.isPressed()) {
-		drive.forward(-.07);
-		rollers(25);
-	}
-}
-
-
 void opcontrol() {
 	while(true) {
 		drive.arcade(
@@ -251,7 +265,6 @@ void opcontrol() {
 		liftControl();
 		tilterControl();
 		liftPresets();
-		slowBack();
 
 		pros::delay(20);
 	}
