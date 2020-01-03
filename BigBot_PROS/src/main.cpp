@@ -245,7 +245,7 @@ void liftPresets() {
 */
 void tilterControl() {
 	if (trayUp.isPressed()) {
-		tilter(100);
+		tilter(75);
 	} else if (trayDown.isPressed()) {
 		tilter(-100);
 	} else {
