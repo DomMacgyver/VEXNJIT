@@ -39,7 +39,7 @@ ControllerButton trayUp(ControllerDigital::R2);
 ControllerButton presetX(ControllerDigital::X);
 ControllerButton presetB(ControllerDigital::B);
 
-ControllerButton slowBackBtn(ControllerDigital::left);
+ControllerButton slowRollBtn(ControllerDigital::Y);
 
 
 auto chassis = ChassisControllerFactory::create(
@@ -49,9 +49,9 @@ auto chassis = ChassisControllerFactory::create(
 	{4_in, 16_in}
 );
 auto motion = AsyncControllerFactory::motionProfile(
+	0.22,
 	0.25,
-	0.3,
-	1.6,
+	1.2,
 	chassis
 );
 auto drive = ChassisModelFactory::create(
@@ -74,51 +74,39 @@ void initialize() {
 
 	pros::lcd::initialize();
 
+	// motion.generatePath(
+	// 	{
+	// 		Point{0_ft, 0_ft, 0_deg},
+	// 		Point{3.5_ft, 0_ft, 0_deg}
+	// 	},
+	// 	"A"
+	// );
 	motion.generatePath(
 		{
 			Point{0_ft, 0_ft, 0_deg},
-			Point{3.5_ft, 0_ft, 0_deg}
-		},
-		"A"
-	);
-	motion.generatePath(
-		{
-			Point{0_ft, 0_ft, 0_deg},
-			Point{-3.0_ft, 2.0_ft, 0_deg}
+			Point{-2.0_ft, 1.0_ft, 0_deg}
 		},
 		"B"
 	);
-	motion.generatePath(
-		{
-			Point{0_ft, 0_ft, 0_deg},
-			Point{2.7_ft, 0_ft, 0_deg}
-		},
-		"C"
-	);
-	motion.generatePath(
-		{
-			Point{0_ft, 0_ft, 0_deg},
-			Point{-2.4_ft, 1.0_ft, 67_deg}
-		},
-		"D"
-	)
+	// motion.generatePath(
+	// 	{
+	// 		Point{0_ft, 0_ft, 0_deg},
+	// 		Point{2.7_ft, 0_ft, 0_deg}
+	// 	},
+	// 	"C"
+	// );
+	// motion.generatePath(
+	// 	{
+	// 		Point{0_ft, 0_ft, 0_deg},
+	// 		Point{-2.4_ft, 1.0_ft, 67_deg}
+	// 	},
+	// 	"D"
+	// );
 }
 
 
 void disabled() {}
 void competition_initialize() {}
-
-
-void autonomous() {
-	rollers(100);
-	motion.setTarget("A", false);
-	motion.waitUntilSettled();
-	motion.setTarget("B", true);
-	motion.waitUntilSettled();
-	motion.setTarget("C", false);
-	motion.waitUntilSettled();
-	motion.setTarget("D", true);
-}
 
 
 /**
@@ -173,6 +161,8 @@ void rollersControl() {
 		rollers(100);
 	} else if (intakeOut.isPressed()) {
 		rollers(-100);
+	} else if (slowRollBtn.isPressed()) {
+		rollers(25);
 	} else {
 		rollers(0);
 	}
@@ -246,24 +236,34 @@ void liftPresets() {
 */
 void tilterControl() {
 	if (trayUp.isPressed()) {
-		tilter(100);
+		tilter(80);
 	} else if (trayDown.isPressed()) {
-		tilter(-100);
+		tilter(-65);
 	} else {
 		tilter(0);
 	}
 }
 
 
-/**
- * Slowly moves the drive backwards while moving the rollers forward.
- * Use this to safely back out after scoring.
-*/
-void slowBack() {
-	if (slowBackBtn.isPressed()) {
-		drive.forward(-.07);
-		rollers(25);
-	}
+void move(QLength distance, int speed) {
+	chassis.setMaxVelocity(speed * 2);
+	chassis.moveDistance(distance);
+
+	chassis.setMaxVelocity(200);
+}
+
+
+void autonomous() {
+	rollers(-100);
+	move(3.0_ft, 30);
+	rollers(0);
+	chassis.moveDistance(-0.8_ft);
+	motion.setTarget("B", true);
+	motion.waitUntilSettled();
+	rollers(-100);
+	move(2.7_ft, 30);
+	rollers(0);
+	move(-1.0_ft, 30);
 }
 
 
@@ -278,7 +278,6 @@ void opcontrol() {
 		liftControl();
 		tilterControl();
 		liftPresets();
-		slowBack();
 
 		pros::delay(20);
 	}
