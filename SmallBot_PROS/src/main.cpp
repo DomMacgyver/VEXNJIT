@@ -75,6 +75,10 @@ void competition_initialize() {}
 void autonomous() {}
 
 
+/**
+ * Moves both roller motors. Speed will depend on the speed parameter.
+ * The range is -100 to 100.
+*/
 void clamp(int speed) {
 	leftClampMotor.move_velocity(speed);
 	rightClampMotor.move_velocity(-speed);
@@ -108,6 +112,10 @@ void clampControl() {
 }
 
 
+/**
+ * Moves the lift. Speed will depend on the speed parameter. The
+ * range is -100 to 100.
+*/
 void lift(int speed) {
 	topLeftLiftMotor.move_velocity(-speed);
 	topRightLiftMotor.move_velocity(speed);
@@ -116,6 +124,11 @@ void lift(int speed) {
 }
 
 
+/**
+ * Moves the lift to a specific absolute position. Position will
+ * depend on the pos parameter. Speed will depend on the speed
+ * parameter.
+*/
 void liftPosition(int pos, int speed) {
 	topLeftLiftMotor.move_absolute(-pos, speed);
 	bottomLeftLiftMotor.move_absolute(pos, speed);
@@ -124,6 +137,13 @@ void liftPosition(int pos, int speed) {
 }
 
 
+/**
+ * Move the lift up or down, depending on the state of the up and down
+ * buttons. If the up button is pressed, the tray will move upwards. If
+ * the down button is pressed, the tray will move downwards. The up
+ * button has priority. The lift will not go down if it is below
+ * a point that is slightly lower than the lift's starting position.
+*/
 void liftControl() {
 	if (liftUpBtn.isPressed()) {
 		lift(80);
@@ -137,6 +157,10 @@ void liftControl() {
 }
 
 
+/**
+ * Moves the lift to a specific height, depending on the button pressed
+ * in the XYAB button mapping.
+*/
 void liftPresets() {
 	if (presetX.isPressed()) {
 		liftPosition(330, 50);
