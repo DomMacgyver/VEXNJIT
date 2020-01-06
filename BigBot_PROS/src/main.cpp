@@ -2,27 +2,27 @@
 
 using namespace std;
 
-int LEFT_ROLLER_PORT = 19;
-int RIGHT_ROLLER_PORT = 11;
-int LEFT_LIFT_PORT = 16;
-int RIGHT_LIFT_PORT = 5;
-int TILTER_PORT = 15;
-int LEFT_DRIVE_1_PORT = 18;
-int LEFT_DRIVE_2_PORT = 20;
-int LEFT_DRIVE_3_PORT = 9;
-int LEFT_DRIVE_4_PORT = 10;
-int RIGHT_DRIVE_1_PORT = 13;
-int RIGHT_DRIVE_2_PORT = 14;
-int RIGHT_DRIVE_3_PORT = 3;
-int RIGHT_DRIVE_4_PORT = 4;
+int8_t LEFT_ROLLER_PORT = 19;
+int8_t RIGHT_ROLLER_PORT = 11;
+int8_t LEFT_LIFT_PORT = 16;
+int8_t RIGHT_LIFT_PORT = 5;
+int8_t TILTER_PORT = 15;
+int8_t LEFT_DRIVE_1_PORT = 18;
+int8_t LEFT_DRIVE_2_PORT = 20;
+int8_t LEFT_DRIVE_3_PORT = 9;
+int8_t LEFT_DRIVE_4_PORT = 10;
+int8_t RIGHT_DRIVE_1_PORT = 13;
+int8_t RIGHT_DRIVE_2_PORT = 14;
+int8_t RIGHT_DRIVE_3_PORT = 3;
+int8_t RIGHT_DRIVE_4_PORT = 4;
 
-Motor leftRoller(LEFT_ROLLER_PORT, false, AbstractMotor::gearset::red);
-Motor rightRoller(RIGHT_ROLLER_PORT, false, AbstractMotor::gearset::red);
+Motor leftRoller(LEFT_ROLLER_PORT, false, AbstractMotor::gearset::red, AbstractMotor::encoderUnits::degrees);
+Motor rightRoller(RIGHT_ROLLER_PORT, false, AbstractMotor::gearset::red, AbstractMotor::encoderUnits::degrees);
 
-Motor leftLift(LEFT_LIFT_PORT, false, AbstractMotor::gearset::green);
-Motor rightLift(RIGHT_LIFT_PORT, false, AbstractMotor::gearset::green);
+Motor leftLift(LEFT_LIFT_PORT, false, AbstractMotor::gearset::green, AbstractMotor::encoderUnits::degrees);
+Motor rightLift(RIGHT_LIFT_PORT, false, AbstractMotor::gearset::green, AbstractMotor::encoderUnits::degrees);
 
-Motor trayMotor(TILTER_PORT, false, AbstractMotor::gearset::red);
+Motor trayMotor(TILTER_PORT, false, AbstractMotor::gearset::red, AbstractMotor::encoderUnits::degrees);
 
 
 Controller joystick;
@@ -42,23 +42,17 @@ ControllerButton presetB(ControllerDigital::B);
 ControllerButton slowRollBtn(ControllerDigital::Y);
 
 
-auto chassis = ChassisControllerFactory::create(
-	{-LEFT_DRIVE_1_PORT, LEFT_DRIVE_2_PORT, LEFT_DRIVE_3_PORT, -LEFT_DRIVE_4_PORT},
-	{RIGHT_DRIVE_1_PORT, -RIGHT_DRIVE_2_PORT, -RIGHT_DRIVE_3_PORT, RIGHT_DRIVE_4_PORT},
-	AbstractMotor::gearset::green,
-	{4_in, 16_in}
-);
-auto motion = AsyncControllerFactory::motionProfile(
-	0.22,
-	0.25,
-	1.2,
-	chassis
-);
-auto drive = ChassisModelFactory::create(
-	{LEFT_DRIVE_1_PORT, -LEFT_DRIVE_2_PORT, -LEFT_DRIVE_3_PORT, LEFT_DRIVE_4_PORT},
-	{-RIGHT_DRIVE_1_PORT, RIGHT_DRIVE_2_PORT, RIGHT_DRIVE_3_PORT, -RIGHT_DRIVE_4_PORT},
-	200.0
-);
+auto chassis = ChassisControllerBuilder()
+	.withMotors(
+		{LEFT_DRIVE_1_PORT, static_cast<int8_t>(-LEFT_DRIVE_2_PORT), static_cast<int8_t>(-LEFT_DRIVE_3_PORT), LEFT_DRIVE_4_PORT},
+		{static_cast<int8_t>(-RIGHT_DRIVE_1_PORT), RIGHT_DRIVE_2_PORT, RIGHT_DRIVE_3_PORT, static_cast<int8_t>(-RIGHT_DRIVE_4_PORT)}
+	).withDimensions(
+		AbstractMotor::gearset::green,
+		{
+			{4_in, 16_in},
+			imev5GreenTPR
+		}
+	).withOdometry().buildOdometry();
 
 
 void on_center_button() {}
@@ -72,36 +66,9 @@ void initialize() {
 	leftLift.tarePosition();
 	rightLift.tarePosition();
 
-	pros::lcd::initialize();
+	chassis->setState({0_in, 0_in, 0_deg});
 
-	// motion.generatePath(
-	// 	{
-	// 		Point{0_ft, 0_ft, 0_deg},
-	// 		Point{3.5_ft, 0_ft, 0_deg}
-	// 	},
-	// 	"A"
-	// );
-	motion.generatePath(
-		{
-			Point{0_ft, 0_ft, 0_deg},
-			Point{-2.0_ft, 1.0_ft, 0_deg}
-		},
-		"B"
-	);
-	// motion.generatePath(
-	// 	{
-	// 		Point{0_ft, 0_ft, 0_deg},
-	// 		Point{2.7_ft, 0_ft, 0_deg}
-	// 	},
-	// 	"C"
-	// );
-	// motion.generatePath(
-	// 	{
-	// 		Point{0_ft, 0_ft, 0_deg},
-	// 		Point{-2.4_ft, 1.0_ft, 67_deg}
-	// 	},
-	// 	"D"
-	// );
+	pros::lcd::initialize();
 }
 
 
@@ -114,8 +81,8 @@ void competition_initialize() {}
  * The range is -100 to 100.
 */
 void rollers(int speed) {
-	leftRoller.move_velocity(-speed);
-	rightRoller.move_velocity(speed);
+	leftRoller.moveVelocity(-speed);
+	rightRoller.moveVelocity(speed);
 }
 
 
@@ -124,8 +91,8 @@ void rollers(int speed) {
  * range is -100 to 100.
 */
 void lift(int speed) {
-	leftLift.move_velocity(speed * 2);
-	rightLift.move_velocity(-speed * 2);
+	leftLift.moveVelocity(speed * 2);
+	rightLift.moveVelocity(-speed * 2);
 }
 
 
@@ -135,8 +102,8 @@ void lift(int speed) {
  * parameter.
 */
 void liftPosition(int pos, int speed) {
-	leftLift.move_absolute(pos, speed);
-	rightLift.move_absolute(-pos, speed);
+	leftLift.moveAbsolute(pos, speed);
+	rightLift.moveAbsolute(-pos, speed);
 }
 
 
@@ -146,7 +113,7 @@ void liftPosition(int pos, int speed) {
  * brakeType of "hold."
 */
 void tilter(int speed) {
-	trayMotor.move_velocity(speed);
+	trayMotor.moveVelocity(speed);
 }
 
 
@@ -201,27 +168,27 @@ void liftPresets() {
 		liftPosition(0, 110);
 	}
 
-	int diff = abs(leftLift.get_position()) - abs(rightLift.get_position());
+	int diff = abs(leftLift.getPosition()) - abs(rightLift.getPosition());
 
 	if (abs(diff) > 90) {
-		int direction = leftLift.get_direction();
+		int direction = leftLift.getDirection();
 
 		int reset_speed = 80;
 		if (direction == 1) {
 			if (diff > 0) {
-				rightLift.move_velocity(0);
-				leftLift.move_absolute(-rightLift.get_position(), reset_speed);
+				rightLift.moveVelocity(0);
+				leftLift.moveAbsolute(-rightLift.getPosition(), reset_speed);
 			} else {
-				leftLift.move_velocity(0);
-				rightLift.move_absolute(-leftLift.get_position(), reset_speed);
+				leftLift.moveVelocity(0);
+				rightLift.moveAbsolute(-leftLift.getPosition(), reset_speed);
 			}
 		} else {
 			if (diff > 0) {
-				rightLift.move_velocity(0);
-				leftLift.move_absolute(-rightLift.get_position(), reset_speed);
+				rightLift.moveVelocity(0);
+				leftLift.moveAbsolute(-rightLift.getPosition(), reset_speed);
 			} else {
-				leftLift.move_velocity(0);
-				rightLift.move_absolute(-leftLift.get_position(), reset_speed);
+				leftLift.moveVelocity(0);
+				rightLift.moveAbsolute(-leftLift.getPosition(), reset_speed);
 			}
 		}
 	}
@@ -245,31 +212,40 @@ void tilterControl() {
 }
 
 
-void move(QLength distance, int speed) {
-	chassis.setMaxVelocity(speed * 2);
-	chassis.moveDistance(distance);
+void forward(QLength x, QLength y, int speed) {
+	chassis->setMaxVelocity(speed * 2);
+	chassis->driveToPoint({x, y});
+	chassis->setMaxVelocity(200);
+}
 
-	chassis.setMaxVelocity(200);
+void backward(QLength x, QLength y, int speed) {
+	chassis->setMaxVelocity(speed * 2);
+	chassis->driveToPoint({x, y}, true);
+	chassis->setMaxVelocity(200);
+}
+
+void turn(QAngle angle, int speed) {
+	chassis->setMaxVelocity(speed * 2);
+	chassis->turnToAngle(angle);
+	chassis->setMaxVelocity(200);
 }
 
 
 void autonomous() {
+	forward(0.5_ft, 0_ft, 15);
 	rollers(-100);
-	move(3.0_ft, 30);
+	forward(1.9_ft, 0_ft, 12);
+	backward(1.0_ft, 0_ft, 10);
 	rollers(0);
-	chassis.moveDistance(-0.8_ft);
-	motion.setTarget("B", true);
-	motion.waitUntilSettled();
-	rollers(-100);
-	move(2.7_ft, 30);
-	rollers(0);
-	move(-1.0_ft, 30);
+	// backward(0_ft, -2.0_ft, 20);
+	// turn(0_deg, 30);
+
 }
 
 
 void opcontrol() {
 	while(true) {
-		drive.arcade(
+		chassis->getModel()->arcade(
 			joystick.getAnalog(ControllerAnalog::leftY),
 			joystick.getAnalog(ControllerAnalog::rightX)
 		);
