@@ -15,16 +15,16 @@ int BOTTOM_RIGHT_LIFT_PORT = 3;
 
 Controller joystick;
 
-Motor leftClampMotor(LEFT_CLAMP_PORT, false, AbstractMotor::gearset::red);
-Motor rightClampMotor(RIGHT_CLAMP_PORT, false, AbstractMotor::gearset::red);
-Motor topLeftLiftMotor(TOP_LEFT_LIFT_PORT, false, AbstractMotor::gearset::red);
-Motor bottomLeftLiftMotor(BOTTOM_LEFT_LIFT_PORT, false, AbstractMotor::gearset::red);
-Motor topRightLiftMotor(TOP_RIGHT_LIFT_PORT, false, AbstractMotor::gearset::red);
-Motor bottomRightLiftMotor(BOTTOM_RIGHT_LIFT_PORT, false, AbstractMotor::gearset::red);
-Motor leftFrontDriveMotor(LEFT_FRONT_DRIVE_PORT, false, AbstractMotor::gearset::green);
-Motor leftBackDriveMotor(LEFT_BACK_DRIVE_PORT, false, AbstractMotor::gearset::green);
-Motor rightFrontDriveMotor(RIGHT_FRONT_DRIVE_PORT, true, AbstractMotor::gearset::green);
-Motor rightBackDriveMotor(RIGHT_BACK_DRIVE_PORT, true, AbstractMotor::gearset::green);
+Motor leftClampMotor(LEFT_CLAMP_PORT, false, AbstractMotor::gearset::red, AbstractMotor::encoderUnits::degrees);
+Motor rightClampMotor(RIGHT_CLAMP_PORT, false, AbstractMotor::gearset::red, AbstractMotor::encoderUnits::degrees);
+Motor topLeftLiftMotor(TOP_LEFT_LIFT_PORT, false, AbstractMotor::gearset::red, AbstractMotor::encoderUnits::degrees);
+Motor bottomLeftLiftMotor(BOTTOM_LEFT_LIFT_PORT, false, AbstractMotor::gearset::red, AbstractMotor::encoderUnits::degrees);
+Motor topRightLiftMotor(TOP_RIGHT_LIFT_PORT, false, AbstractMotor::gearset::red, AbstractMotor::encoderUnits::degrees);
+Motor bottomRightLiftMotor(BOTTOM_RIGHT_LIFT_PORT, false, AbstractMotor::gearset::red, AbstractMotor::encoderUnits::degrees);
+Motor leftFrontDriveMotor(LEFT_FRONT_DRIVE_PORT, false, AbstractMotor::gearset::green, AbstractMotor::encoderUnits::degrees);
+Motor leftBackDriveMotor(LEFT_BACK_DRIVE_PORT, false, AbstractMotor::gearset::green, AbstractMotor::encoderUnits::degrees);
+Motor rightFrontDriveMotor(RIGHT_FRONT_DRIVE_PORT, true, AbstractMotor::gearset::green, AbstractMotor::encoderUnits::degrees);
+Motor rightBackDriveMotor(RIGHT_BACK_DRIVE_PORT, true, AbstractMotor::gearset::green, AbstractMotor::encoderUnits::degrees);
 
 
 ControllerButton clampInBtn(ControllerDigital::L1);
@@ -37,30 +37,19 @@ ControllerButton presetA(ControllerDigital::A);
 ControllerButton presetB(ControllerDigital::B);
 
 
-auto chassis = ChassisModelFactory::create(
-	leftFrontDriveMotor,
-	rightFrontDriveMotor,
-	rightBackDriveMotor,
-	leftBackDriveMotor,
-	200.0
-);
-
-auto autonChassis = ChassisControllerFactory::create(
-	leftFrontDriveMotor,
-	rightFrontDriveMotor,
-	rightBackDriveMotor,
-	leftBackDriveMotor,
-	AbstractMotor::gearset::green,
-	{4.0_in, 11.0_in}
-);
-
-auto motion = AsyncControllerFactory::motionProfile(
-	0.22,
-	0.25,
-	1.2,
-	autonChassis
-);
-
+auto chassis = ChassisControllerBuilder()
+	.withMotors(
+		leftFrontDriveMotor,
+		rightFrontDriveMotor,
+		rightBackDriveMotor,
+		leftBackDriveMotor
+	).withDimensions(
+		AbstractMotor::gearset::green,
+		{
+			{4.0_in, 11.0_in},
+			imev5GreenTPR
+		}
+	).build();
 
 
 void on_center_button() {}
@@ -81,14 +70,6 @@ void initialize() {
 	rightClampMotor.setBrakeMode(AbstractMotor::brakeMode::hold);
 
 	pros::lcd::initialize();
-
-	motion.generatePath(
-		{
-			Point{0_ft, 0_ft, 0_deg},
-			Point{2_ft, 0_ft, 0_deg}
-		},
-		"A"
-	);
 }
 
 
@@ -97,13 +78,22 @@ void disabled() {}
 void competition_initialize() {}
 
 
+void drive(double forward, double strafe, double turn) {
+	static_pointer_cast<XDriveModel>(chassis->getModel())->xArcade(
+		strafe,
+		forward,
+		turn
+	);
+}
+
+
 /**
  * Moves both roller motors. Speed will depend on the speed parameter.
  * The range is -100 to 100.
 */
 void clamp(int speed) {
-	leftClampMotor.move_velocity(speed);
-	rightClampMotor.move_velocity(-speed);
+	leftClampMotor.moveVelocity(speed);
+	rightClampMotor.moveVelocity(-speed);
 }
 
 
@@ -113,8 +103,8 @@ void clamp(int speed) {
  * parameter.
 */
 void clampPosition(int pos, int speed) {
-	leftClampMotor.move_absolute(pos, speed);
-	rightClampMotor.move_absolute(-pos, speed);
+	leftClampMotor.moveAbsolute(pos, speed);
+	rightClampMotor.moveAbsolute(-pos, speed);
 }
 
 
@@ -139,10 +129,10 @@ void clampControl() {
  * range is -100 to 100.
 */
 void lift(int speed) {
-	topLeftLiftMotor.move_velocity(-speed);
-	topRightLiftMotor.move_velocity(speed);
-	bottomLeftLiftMotor.move_velocity(speed);
-	bottomRightLiftMotor.move_velocity(-speed);
+	topLeftLiftMotor.moveVelocity(-speed);
+	topRightLiftMotor.moveVelocity(speed);
+	bottomLeftLiftMotor.moveVelocity(speed);
+	bottomRightLiftMotor.moveVelocity(-speed);
 }
 
 
@@ -152,10 +142,10 @@ void lift(int speed) {
  * parameter.
 */
 void liftPosition(int pos, int speed) {
-	topLeftLiftMotor.move_absolute(-pos, speed);
-	bottomLeftLiftMotor.move_absolute(pos, speed);
-	topRightLiftMotor.move_absolute(pos, speed);
-	bottomRightLiftMotor.move_absolute(-pos, speed);
+	topLeftLiftMotor.moveAbsolute(-pos, speed);
+	bottomLeftLiftMotor.moveAbsolute(pos, speed);
+	topRightLiftMotor.moveAbsolute(pos, speed);
+	bottomRightLiftMotor.moveAbsolute(-pos, speed);
 }
 
 
@@ -169,13 +159,25 @@ void liftPosition(int pos, int speed) {
 void liftControl() {
 	if (liftUpBtn.isPressed()) {
 		lift(80);
-	} else if (liftDownBtn.isPressed() && topLeftLiftMotor.get_position() < -30) {
+	} else if (liftDownBtn.isPressed() && topLeftLiftMotor.getPosition() < -30) {
 		lift(-50);
 	}
 
 	if (liftUpBtn.changedToReleased() || liftDownBtn.changedToReleased()) {
 		lift(0);
 	}
+}
+
+
+void driveControl() {
+	double forward = joystick.getAnalog(ControllerAnalog::leftY) * 0.9;
+	double strafe = joystick.getAnalog(ControllerAnalog::leftX);
+	double turn = joystick.getAnalog(ControllerAnalog::rightX) * 0.7;
+
+	if (fabs(strafe) < .15) {
+		strafe = 0.0;
+	}
+	drive(forward, strafe, turn);
 }
 
 
@@ -196,33 +198,26 @@ void liftPresets() {
 }
 
 
-void move(QLength distance, int speed) {
-	autonChassis.setMaxVelocity(speed * 2);
-	autonChassis.moveDistance(distance);
 
-	autonChassis.setMaxVelocity(200);
+
+
+void move(QLength distance, int speed) {
+
 }
 
 
 void autonomous() {
-	motion.setTarget("A", false);
-	motion.waitUntilSettled();
+
 }
 
 
 
 void opcontrol() {
 	while (true) {
-		chassis.xArcade(
-			joystick.getAnalog(ControllerAnalog::leftX) * 0.9,
-			joystick.getAnalog(ControllerAnalog::leftY),
-			joystick.getAnalog(ControllerAnalog::rightX) * 0.7
-		);
-
 		clampControl();
 		liftControl();
+		driveControl();
 		liftPresets();
-
 
 		pros::delay(20);
 	}
