@@ -42,6 +42,18 @@ ControllerButton presetB(ControllerDigital::B);
 ControllerButton slowRollBtn(ControllerDigital::Y);
 
 
+// auto chassis = ChassisControllerBuilder()
+// 	.withMotors(
+// 		{LEFT_DRIVE_1_PORT, static_cast<int8_t>(-LEFT_DRIVE_2_PORT), static_cast<int8_t>(-LEFT_DRIVE_3_PORT), LEFT_DRIVE_4_PORT},
+// 		{static_cast<int8_t>(-RIGHT_DRIVE_1_PORT), RIGHT_DRIVE_2_PORT, RIGHT_DRIVE_3_PORT, static_cast<int8_t>(-RIGHT_DRIVE_4_PORT)}
+// 	).withDimensions(
+// 		AbstractMotor::gearset::green,
+// 		{
+// 			{4_in, 16_in},
+// 			imev5GreenTPR
+// 		}
+// 	).withOdometry().buildOdometry();
+
 auto chassis = ChassisControllerBuilder()
 	.withMotors(
 		{LEFT_DRIVE_1_PORT, static_cast<int8_t>(-LEFT_DRIVE_2_PORT), static_cast<int8_t>(-LEFT_DRIVE_3_PORT), LEFT_DRIVE_4_PORT},
@@ -52,7 +64,8 @@ auto chassis = ChassisControllerBuilder()
 			{4_in, 16_in},
 			imev5GreenTPR
 		}
-	).withOdometry().buildOdometry();
+	).build();
+
 
 
 void on_center_button() {}
@@ -66,7 +79,7 @@ void initialize() {
 	leftLift.tarePosition();
 	rightLift.tarePosition();
 
-	chassis->setState({0_in, 0_in, 0_deg});
+	// chassis->setState({0_in, 0_in, 0_deg});
 
 	pros::lcd::initialize();
 }
@@ -212,33 +225,56 @@ void tilterControl() {
 }
 
 
-void forward(QLength x, QLength y, int speed) {
-	chassis->setMaxVelocity(speed * 2);
-	chassis->driveToPoint({x, y});
-	chassis->setMaxVelocity(200);
-}
-
-void backward(QLength x, QLength y, int speed) {
-	chassis->setMaxVelocity(speed * 2);
-	chassis->driveToPoint({x, y}, true);
-	chassis->setMaxVelocity(200);
-}
-
-void turn(QAngle angle, int speed) {
-	chassis->setMaxVelocity(speed * 2);
-	chassis->turnToAngle(angle);
-	chassis->setMaxVelocity(200);
-}
-
+// void forward(QLength x, QLength y, int speed) {
+// 	chassis->setMaxVelocity(speed * 2);
+// 	chassis->driveToPoint({x, y});
+// 	chassis->setMaxVelocity(200);
+// 	chassis->setState({0_in, 0_in, 0_deg});
+// }
+//
+// void backward(QLength x, QLength y, int speed) {
+// 	chassis->setMaxVelocity(speed * 2);
+// 	chassis->driveToPoint({x, y}, true);
+// 	chassis->setMaxVelocity(200);
+// 	chassis->setState({0_in, 0_in, 0_deg});
+// }
+//
+// void turn(QAngle angle, int speed) {
+// 	chassis->setMaxVelocity(speed * 2);
+// 	chassis->turnToAngle(angle);
+// 	chassis->setMaxVelocity(200);
+// 	chassis->setState({0_in, 0_in, 0_deg});
+// }
+//
 
 void autonomous() {
-	forward(0.5_ft, 0_ft, 15);
+	// forward(0.5_ft, 0_ft, 15);
+	// rollers(-90);
+	// forward(1.4_ft, 0_ft, 12);
+	// rollers(0);
+	// backward(-1.0_ft, 0_ft, 15);
+
+	chassis->setMaxVelocity(30);
+	chassis->moveDistanceAsync(0.5_ft);
+	chassis->waitUntilSettled();
 	rollers(-100);
-	forward(1.9_ft, 0_ft, 12);
-	backward(1.0_ft, 0_ft, 10);
+	chassis->setMaxVelocity(24);
+	chassis->moveDistanceAsync(1.5_ft);
+	chassis->waitUntilSettled();
 	rollers(0);
-	// backward(0_ft, -2.0_ft, 20);
-	// turn(0_deg, 30);
+	chassis->setMaxVelocity(35);
+	chassis->moveDistance(-0.6_ft);
+	chassis->turnAngle(28_deg);
+	chassis->moveDistance(-1.8_ft);
+	chassis->turnAngle(-36_deg);
+	chassis->setMaxVelocity(30);
+	rollers(-100);
+	chassis->setMaxVelocity(24);
+	chassis->moveDistanceAsync(1.5_ft);
+	chassis->waitUntilSettled();
+	rollers(0);
+	chassis->moveDistance(-1.0_ft);
+	chassis->turnAngle(-135_deg);
 
 }
 

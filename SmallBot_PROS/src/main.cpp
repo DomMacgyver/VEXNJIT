@@ -49,7 +49,9 @@ auto chassis = ChassisControllerBuilder()
 			{4.0_in, 11.0_in},
 			imev5GreenTPR
 		}
-	).build();
+	).withOdometry().buildOdometry();
+
+auto model = static_pointer_cast<XDriveModel>(chassis->getModel());
 
 
 void on_center_button() {}
@@ -79,7 +81,7 @@ void competition_initialize() {}
 
 
 void drive(double forward, double strafe, double turn) {
-	static_pointer_cast<XDriveModel>(chassis->getModel())->xArcade(
+	model->xArcade(
 		strafe,
 		forward,
 		turn
@@ -201,13 +203,35 @@ void liftPresets() {
 
 
 
-void move(QLength distance, int speed) {
+void forward(QLength x, QLength y, int speed) {
+	chassis->setMaxVelocity(speed * 2);
+	chassis->driveToPoint({x, y});
+	chassis->setMaxVelocity(200);
+}
 
+void backward(QLength x, QLength y, int speed) {
+	chassis->setMaxVelocity(speed * 2);
+	chassis->driveToPoint({x, y}, true);
+	chassis->setMaxVelocity(200);
+}
+
+void turn(QAngle angle, int speed) {
+	chassis->setMaxVelocity(speed * 2);
+	chassis->turnToAngle(angle);
+	chassis->setMaxVelocity(200);
 }
 
 
 void autonomous() {
-
+	model->setMaxVelocity(70);
+	model->forward(-70);
+	pros::delay(1100);
+	model->stop();
+	pros::delay(1000);
+	model->forward(40);
+	pros::delay(500);
+	model->stop();
+	model->setMaxVelocity(200);
 }
 
 
