@@ -189,10 +189,8 @@ void driveControl() {
 */
 void liftPresets() {
 	if (presetX.isPressed()) {
-		liftPosition(330, 50);
-	}
-	if (presetA.isPressed()) {
-		liftPosition(240, 50);
+		// UNTESTED
+		liftPosition(40, 50);
 	}
 	if (presetB.isPressed()) {
 		liftPosition(0, 50);
