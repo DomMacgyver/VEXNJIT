@@ -42,18 +42,6 @@ ControllerButton presetB(ControllerDigital::B);
 ControllerButton slowRollBtn(ControllerDigital::Y);
 
 
-// auto chassis = ChassisControllerBuilder()
-// 	.withMotors(
-// 		{LEFT_DRIVE_1_PORT, static_cast<int8_t>(-LEFT_DRIVE_2_PORT), static_cast<int8_t>(-LEFT_DRIVE_3_PORT), LEFT_DRIVE_4_PORT},
-// 		{static_cast<int8_t>(-RIGHT_DRIVE_1_PORT), RIGHT_DRIVE_2_PORT, RIGHT_DRIVE_3_PORT, static_cast<int8_t>(-RIGHT_DRIVE_4_PORT)}
-// 	).withDimensions(
-// 		AbstractMotor::gearset::green,
-// 		{
-// 			{4_in, 16_in},
-// 			imev5GreenTPR
-// 		}
-// 	).withOdometry().buildOdometry();
-
 auto chassis = ChassisControllerBuilder()
 	.withMotors(
 		{LEFT_DRIVE_1_PORT, static_cast<int8_t>(-LEFT_DRIVE_2_PORT), static_cast<int8_t>(-LEFT_DRIVE_3_PORT), LEFT_DRIVE_4_PORT},
@@ -61,12 +49,32 @@ auto chassis = ChassisControllerBuilder()
 	).withDimensions(
 		AbstractMotor::gearset::green,
 		{
-			{4_in, 16_in},
-			imev5GreenTPR
+			{6.1_in, 12.5_in},
+			static_cast<int32_t>(imev5GreenTPR * 2.0)
 		}
 	).build();
 
+auto profileController = AsyncMotionProfileControllerBuilder()
+	.withLimits(
+		{
+			0.42,
+			0.8,
+			5.2
+		}
+	).withOutput(
+		chassis
+	).buildMotionProfileController();
 
+auto cubeIntakeController = AsyncMotionProfileControllerBuilder()
+	.withLimits(
+		{
+			0.25,
+			1.5,
+			3.0
+		}
+	).withOutput(
+		chassis
+	).buildMotionProfileController();
 
 void on_center_button() {}
 
@@ -79,7 +87,49 @@ void initialize() {
 	leftLift.tarePosition();
 	rightLift.tarePosition();
 
-	// chassis->setState({0_in, 0_in, 0_deg});
+	profileController->generatePath(
+		{
+			{0_ft, 0_ft, 0_deg},
+			{.4_ft, 0_ft, 0_deg}
+		},
+		"A"
+	);
+	cubeIntakeController->generatePath(
+		{
+			{0_ft, 0_ft, 0_deg},
+			{2.6_ft, 0_ft, 0_deg}
+		},
+		"B"
+	);
+	profileController->generatePath(
+		{
+			{0_ft, 0_ft, 0_deg},
+			{2.6_ft, -2.0_ft, 0_deg}
+		},
+		"C"
+	);
+	profileController->generatePath(
+		{
+			{0_ft, 0_ft, 0_deg},
+			{.9_ft, 0_ft, 0_deg}
+		},
+		"D"
+	);
+	profileController->generatePath(
+		{
+			{0_ft, 0_ft, 0_deg},
+			{1.7_ft, 1.5_ft, 0_deg}
+		},
+		"E"
+	);
+	profileController->generatePath(
+		{
+			{0_ft, 0_ft, 0_deg},
+			{1.4_ft, 0_ft, 0_deg}
+		},
+		"F"
+	);
+
 
 	pros::lcd::initialize();
 }
@@ -239,42 +289,40 @@ void tilterControl() {
 // 	chassis->setState({0_in, 0_in, 0_deg});
 // }
 //
-// void turn(QAngle angle, int speed) {
-// 	chassis->setMaxVelocity(speed * 2);
-// 	chassis->turnToAngle(angle);
-// 	chassis->setMaxVelocity(200);
-// 	chassis->setState({0_in, 0_in, 0_deg});
-// }
-//
+void turn(QAngle angle, int speed) {
+	chassis->setMaxVelocity(speed * 2);
+	chassis->turnAngle(angle);
+	chassis->setMaxVelocity(200);
+}
+
 
 void autonomous() {
-	// forward(0.5_ft, 0_ft, 15);
-	// rollers(-90);
-	// forward(1.4_ft, 0_ft, 12);
-	// rollers(0);
-	// backward(-1.0_ft, 0_ft, 15);
+	profileController->setTarget("A");
+	profileController->waitUntilSettled();
+	rollers(-100);
+	cubeIntakeController->setTarget("B");
+	cubeIntakeController->waitUntilSettled();
+	pros::delay(40);
+	rollers(0);
 
-	chassis->setMaxVelocity(30);
-	chassis->moveDistanceAsync(0.5_ft);
-	chassis->waitUntilSettled();
+	profileController->setTarget("C", true);
+	profileController->waitUntilSettled();
+
+	profileController->setTarget("D");
+	profileController->waitUntilSettled();
 	rollers(-100);
-	chassis->setMaxVelocity(24);
-	chassis->moveDistanceAsync(1.5_ft);
-	chassis->waitUntilSettled();
+	cubeIntakeController->setTarget("B");
+	cubeIntakeController->waitUntilSettled();
+	pros::delay(100);
 	rollers(0);
-	chassis->setMaxVelocity(35);
-	chassis->moveDistance(-0.6_ft);
-	chassis->turnAngle(28_deg);
-	chassis->moveDistance(-1.8_ft);
-	chassis->turnAngle(-36_deg);
-	chassis->setMaxVelocity(30);
-	rollers(-100);
-	chassis->setMaxVelocity(24);
-	chassis->moveDistanceAsync(1.5_ft);
-	chassis->waitUntilSettled();
-	rollers(0);
-	chassis->moveDistance(-1.0_ft);
-	chassis->turnAngle(-135_deg);
+
+	profileController->setTarget("E", true);
+	profileController->waitUntilSettled();
+
+	turn(215_deg, 20);
+
+	profileController->setTarget("F");
+	profileController->waitUntilSettled();
 
 }
 

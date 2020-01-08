@@ -49,9 +49,20 @@ auto chassis = ChassisControllerBuilder()
 			{4.0_in, 11.0_in},
 			imev5GreenTPR
 		}
-	).withOdometry().buildOdometry();
+	).build();
 
 auto model = static_pointer_cast<XDriveModel>(chassis->getModel());
+
+auto profileController = AsyncMotionProfileControllerBuilder()
+	.withLimits(
+		{
+			1.0,
+			2.0,
+			10.0
+		}
+	).withOutput(
+		chassis
+	).buildMotionProfileController();
 
 
 void on_center_button() {}
@@ -70,6 +81,21 @@ void initialize() {
 
 	leftClampMotor.setBrakeMode(AbstractMotor::brakeMode::hold);
 	rightClampMotor.setBrakeMode(AbstractMotor::brakeMode::hold);
+
+	profileController->generatePath(
+		{
+			{0_ft, 0_ft, 0_deg},
+			{2_ft, 1_ft, 0_deg}
+		},
+		"A"
+	);
+	profileController->generatePath(
+		{
+			{0_ft, 0_ft, 0_deg},
+			{2_ft, -1_ft, 0_deg}
+		},
+		"B"
+	);
 
 	pros::lcd::initialize();
 }
@@ -189,8 +215,7 @@ void driveControl() {
 */
 void liftPresets() {
 	if (presetX.isPressed()) {
-		// UNTESTED
-		liftPosition(40, 50);
+		liftPosition(80, 50);
 	}
 	if (presetB.isPressed()) {
 		liftPosition(0, 50);
@@ -199,37 +224,21 @@ void liftPresets() {
 
 
 
-
-
-void forward(QLength x, QLength y, int speed) {
-	chassis->setMaxVelocity(speed * 2);
-	chassis->driveToPoint({x, y});
-	chassis->setMaxVelocity(200);
-}
-
-void backward(QLength x, QLength y, int speed) {
-	chassis->setMaxVelocity(speed * 2);
-	chassis->driveToPoint({x, y}, true);
-	chassis->setMaxVelocity(200);
-}
-
-void turn(QAngle angle, int speed) {
-	chassis->setMaxVelocity(speed * 2);
-	chassis->turnToAngle(angle);
-	chassis->setMaxVelocity(200);
-}
-
-
 void autonomous() {
-	model->setMaxVelocity(70);
-	model->forward(-70);
-	pros::delay(1100);
-	model->stop();
-	pros::delay(1000);
-	model->forward(40);
-	pros::delay(500);
-	model->stop();
-	model->setMaxVelocity(200);
+	// model->setMaxVelocity(70);
+	// model->forward(-70);
+	// pros::delay(1100);
+	// model->stop();
+	// pros::delay(1000);
+	// model->forward(40);
+	// pros::delay(500);
+	// model->stop();
+	// model->setMaxVelocity(200);
+
+	profileController->setTarget("A");
+	profileController->waitUntilSettled();
+	profileController->setTarget("B", true);
+	profileController->waitUntilSettled();
 }
 
 
