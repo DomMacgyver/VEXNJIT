@@ -37,6 +37,7 @@ ControllerButton trayDown(ControllerDigital::R1);
 ControllerButton trayUp(ControllerDigital::R2);
 
 ControllerButton presetX(ControllerDigital::X);
+ControllerButton presetA(ControllerDigital::A);
 ControllerButton presetB(ControllerDigital::B);
 
 ControllerButton slowRollBtn(ControllerDigital::Y);
@@ -75,6 +76,9 @@ auto cubeIntakeController = AsyncMotionProfileControllerBuilder()
 	).withOutput(
 		chassis
 	).buildMotionProfileController();
+
+// auto timer = TimeUtilFactory::create();
+
 
 void on_center_button() {}
 
@@ -165,8 +169,8 @@ void lift(int speed) {
  * parameter.
 */
 void liftPosition(int pos, int speed) {
-	leftLift.moveAbsolute(pos, speed);
-	rightLift.moveAbsolute(-pos, speed);
+	leftLift.moveAbsolute(pos, speed * 2);
+	rightLift.moveAbsolute(-pos, speed * 2);
 }
 
 
@@ -177,6 +181,11 @@ void liftPosition(int pos, int speed) {
 */
 void tilter(int speed) {
 	trayMotor.moveVelocity(speed);
+}
+
+
+void tilterPosition(int pos, int speed) {
+	trayMotor.moveAbsolute(pos, speed);
 }
 
 
@@ -215,6 +224,23 @@ void liftControl() {
 	if (liftUp.changedToReleased() || liftDown.changedToReleased()) {
 		lift(0);
 	}
+
+	// if (liftDown.changedToPressed()) {
+	//
+	// }
+}
+
+
+void presets(string preset) {
+	if (preset == "X") {
+		liftPosition(690, 80);
+	}
+	if (preset == "A") {
+		liftPosition(905, 80);
+	}
+	if (preset == "B") {
+		liftPosition(5, 80);
+	}
 }
 
 
@@ -223,12 +249,15 @@ void liftControl() {
  * in the XYAB button mapping. If there is a significant difference
  * between the two arms, they will stop and automatically re-align.
 */
-void liftPresets() {
+void presetControl() {
 	if (presetX.isPressed()) {
-		liftPosition(1100, 110);
+		presets("X");
+	}
+	if (presetA.isPressed()) {
+		presets("A");
 	}
 	if (presetB.isPressed()) {
-		liftPosition(0, 110);
+		presets("B");
 	}
 
 	int diff = abs(leftLift.getPosition()) - abs(rightLift.getPosition());
@@ -275,20 +304,7 @@ void tilterControl() {
 }
 
 
-// void forward(QLength x, QLength y, int speed) {
-// 	chassis->setMaxVelocity(speed * 2);
-// 	chassis->driveToPoint({x, y});
-// 	chassis->setMaxVelocity(200);
-// 	chassis->setState({0_in, 0_in, 0_deg});
-// }
-//
-// void backward(QLength x, QLength y, int speed) {
-// 	chassis->setMaxVelocity(speed * 2);
-// 	chassis->driveToPoint({x, y}, true);
-// 	chassis->setMaxVelocity(200);
-// 	chassis->setState({0_in, 0_in, 0_deg});
-// }
-//
+
 void turn(QAngle angle, int speed) {
 	chassis->setMaxVelocity(speed * 2);
 	chassis->turnAngle(angle);
@@ -337,7 +353,7 @@ void opcontrol() {
 		rollersControl();
 		liftControl();
 		tilterControl();
-		liftPresets();
+		presetControl();
 
 		pros::delay(20);
 	}

@@ -77,6 +77,7 @@ void opcontrol(void);
  */
 //#include <iostream>
 #include <string>
+#include <thread>
 #endif
 
 #endif  // _PROS_MAIN_H_
