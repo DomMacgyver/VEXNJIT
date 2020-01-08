@@ -64,6 +64,28 @@ auto profileController = AsyncMotionProfileControllerBuilder()
 		chassis
 	).buildMotionProfileController();
 
+auto cubeIntakeController = AsyncMotionProfileControllerBuilder()
+	.withLimits(
+		{
+			0.1,
+			0.8,
+			2.0
+		}
+	).withOutput(
+		chassis
+	).buildMotionProfileController();
+
+auto slowController = AsyncMotionProfileControllerBuilder()
+	.withLimits(
+		{
+			0.25,
+			1.5,
+			3.0
+		}
+	).withOutput(
+		chassis
+	).buildMotionProfileController();
+
 
 void on_center_button() {}
 
@@ -85,17 +107,46 @@ void initialize() {
 	profileController->generatePath(
 		{
 			{0_ft, 0_ft, 0_deg},
-			{2_ft, 1_ft, 0_deg}
+			{1.0_ft, 0_ft, 0_deg}
 		},
 		"A"
 	);
 	profileController->generatePath(
 		{
 			{0_ft, 0_ft, 0_deg},
-			{2_ft, -1_ft, 0_deg}
+			{0.5_ft, 0.5_ft, 0_deg}
 		},
 		"B"
+	)
+	cubeIntakeController->generatePath(
+		{
+			{0_ft, 0_ft, 0_deg},
+			{0.3_ft, 0_ft, 0_deg}
+		},
+		"C"
 	);
+	slowController->generatePath(
+		{
+			{0_ft, 0_ft, 0_deg},
+			{1_ft, 0_ft, 0_deg}
+		},
+		"D"
+	);
+	slowController->generatePath(
+		{
+			{0_ft, 0_ft, 0_deg},
+			{2.4_ft, 0_ft, 0_deg}
+		},
+		"E"
+	);
+	slowController->generatePath(
+		{
+			{0_ft, 0_ft, 0_deg},
+			{1_ft, 0_ft, 0_deg}
+		},
+		"F"
+	);
+
 
 	pros::lcd::initialize();
 }
@@ -225,20 +276,33 @@ void liftPresets() {
 
 
 void autonomous() {
-	// model->setMaxVelocity(70);
-	// model->forward(-70);
-	// pros::delay(1100);
-	// model->stop();
-	// pros::delay(1000);
-	// model->forward(40);
-	// pros::delay(500);
-	// model->stop();
-	// model->setMaxVelocity(200);
+	clampPosition(100);
 
 	profileController->setTarget("A");
 	profileController->waitUntilSettled();
-	profileController->setTarget("B", true);
+
+	profileController->setTarget("B");
 	profileController->waitUntilSettled();
+
+	cubeIntakeController->setTarget("C");
+	cubeIntakeController->waitUntilSettled();
+
+	clampPosition(200);
+	liftPosition(75, 20);
+
+	slowController->setTarget("D", true);
+	slowController->waitUntilSettled();
+
+	chassis.turnAngle(90_deg);
+
+	slowController->setTarget("E");
+	slowController->waitUntilSettled();
+
+	clampPosition(100);
+	liftPosition(0, 20);
+
+	slowController->setTarget("F", true);
+	slowController->waitUntilSettled();
 }
 
 
