@@ -39,8 +39,7 @@ ControllerButton trayUp(ControllerDigital::R2);
 ControllerButton presetX(ControllerDigital::X);
 ControllerButton presetA(ControllerDigital::A);
 ControllerButton presetB(ControllerDigital::B);
-
-ControllerButton slowRollBtn(ControllerDigital::Y);
+ControllerButton presetY(ControllerDigital::Y);
 
 
 auto chassis = ChassisControllerBuilder()
@@ -77,7 +76,7 @@ auto cubeIntakeController = AsyncMotionProfileControllerBuilder()
 		chassis
 	).buildMotionProfileController();
 
-// auto timer = TimeUtilFactory::create();
+auto timer = TimeUtilFactory().create().getTimer();
 
 
 void on_center_button() {}
@@ -90,6 +89,7 @@ void initialize() {
 
 	leftLift.tarePosition();
 	rightLift.tarePosition();
+	trayMotor.tarePosition();
 
 	profileController->generatePath(
 		{
@@ -175,15 +175,20 @@ void liftPosition(int pos, int speed) {
 
 
 /**
- * Moves the tray motor. Speed will depend on the speed parameter. The
- * range is -100 to 100. If speed is 0, the motor will stop with a
- * brakeType of "hold."
+ * Moves the tilter. Speed will depend on the speed parameter. The range
+ * is -100 to 100. If speed is 0, the motor will stop with a brakeType
+ * of "hold."
 */
 void tilter(int speed) {
 	trayMotor.moveVelocity(speed);
 }
 
 
+/**
+ * Moves the tilter to a specific absolute position. Position will
+ * depend on the pos parameter. Speed will depend on the speed
+ * parameter.
+*/
 void tilterPosition(int pos, int speed) {
 	trayMotor.moveAbsolute(pos, speed);
 }
@@ -200,8 +205,6 @@ void rollersControl() {
 		rollers(100);
 	} else if (intakeOut.isPressed()) {
 		rollers(-100);
-	} else if (slowRollBtn.isPressed()) {
-		rollers(25);
 	} else {
 		rollers(0);
 	}
@@ -224,13 +227,13 @@ void liftControl() {
 	if (liftUp.changedToReleased() || liftDown.changedToReleased()) {
 		lift(0);
 	}
-
-	// if (liftDown.changedToPressed()) {
-	//
-	// }
 }
 
 
+/**
+ * Moves different mechanisms to certain positions based on the
+ * parameter, preset. Each preset will call different functions.
+*/
 void presets(string preset) {
 	if (preset == "X") {
 		liftPosition(690, 80);
@@ -240,6 +243,9 @@ void presets(string preset) {
 	}
 	if (preset == "B") {
 		liftPosition(5, 80);
+	}
+	if (preset == "Y") {
+		tilterPosition(0, 40);
 	}
 }
 
@@ -258,6 +264,9 @@ void presetControl() {
 	}
 	if (presetB.isPressed()) {
 		presets("B");
+	}
+	if (presetY.isPressed()) {
+		presets("Y");
 	}
 
 	int diff = abs(leftLift.getPosition()) - abs(rightLift.getPosition());
@@ -294,17 +303,21 @@ void presetControl() {
  * button has priority.
 */
 void tilterControl() {
-	if (trayUp.isPressed()) {
+	if (trayUp.isPressed() && trayMotor.getTargetVelocity() != 40) {
 		tilter(80);
 	} else if (trayDown.isPressed()) {
 		tilter(-65);
-	} else {
+	}
+	if (trayUp.changedToReleased() || trayDown.changedToReleased()) {
 		tilter(0);
 	}
 }
 
 
-
+/**
+ * Turns the robot clockwise to a certain angle (angle) with a certain
+ * velocity (speed).
+*/
 void turn(QAngle angle, int speed) {
 	chassis->setMaxVelocity(speed * 2);
 	chassis->turnAngle(angle);
@@ -313,6 +326,10 @@ void turn(QAngle angle, int speed) {
 
 
 void autonomous() {
+	presets("X");
+	pros::delay(2000);
+	presets("B");
+
 	profileController->setTarget("A");
 	profileController->waitUntilSettled();
 	rollers(-100);

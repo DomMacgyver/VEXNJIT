@@ -46,7 +46,7 @@ auto chassis = ChassisControllerBuilder()
 	).withDimensions(
 		AbstractMotor::gearset::green,
 		{
-			{4.0_in, 11.0_in},
+			{5.4_in, 25.0_in},
 			imev5GreenTPR
 		}
 	).build();
@@ -117,7 +117,7 @@ void initialize() {
 			{0.5_ft, 0.5_ft, 0_deg}
 		},
 		"B"
-	)
+	);
 	cubeIntakeController->generatePath(
 		{
 			{0_ft, 0_ft, 0_deg},
@@ -147,6 +147,14 @@ void initialize() {
 		"F"
 	);
 
+
+	profileController->generatePath(
+		{
+			{0_ft, 0_ft, 0_deg},
+			{2_ft, 2_ft, 0_deg}
+		},
+		"test"
+	);
 
 	pros::lcd::initialize();
 }
@@ -276,7 +284,8 @@ void liftPresets() {
 
 
 void autonomous() {
-	clampPosition(100);
+
+	clampPosition(100, 30);
 
 	profileController->setTarget("A");
 	profileController->waitUntilSettled();
@@ -287,22 +296,25 @@ void autonomous() {
 	cubeIntakeController->setTarget("C");
 	cubeIntakeController->waitUntilSettled();
 
-	clampPosition(200);
+	clampPosition(200, 30);
 	liftPosition(75, 20);
 
 	slowController->setTarget("D", true);
 	slowController->waitUntilSettled();
 
-	chassis.turnAngle(90_deg);
+	chassis->turnAngle(90_deg);
 
 	slowController->setTarget("E");
 	slowController->waitUntilSettled();
 
-	clampPosition(100);
+	clampPosition(100, 30);
 	liftPosition(0, 20);
 
 	slowController->setTarget("F", true);
 	slowController->waitUntilSettled();
+	//
+	// profileController->setTarget("test");
+	// profileController->waitUntilSettled();
 }
 
 
